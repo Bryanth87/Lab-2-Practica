@@ -1,0 +1,142 @@
+import { body, param } from 'express-validator';
+import User from '../models/user.model.js';
+import Course from '../models/course.model.js';
+
+export const registeredCourseValidator = [
+  body('studentId')
+    .not().isEmpty().withMessage('El ID del estudiante es requerido')
+    .bail()
+    .custom(async (value) => {
+      const user = await User.findById(value);
+      if (!user) {
+        throw new Error('Estudiante no encontrado');
+      }
+      if (user.role !== 'STUDENT_ROLE') {
+        throw new Error('Solo los estudiantes se pueden inscribir');
+      }
+      return true;
+    }),
+  body('courseId')
+    .not().isEmpty().withMessage('El ID del curso es requerido')
+    .bail()
+    .custom(async (value) => {
+      const course = await Course.findById(value);
+      if (!course) {
+        throw new Error('Curso no encontrado');
+      }
+      return true;
+    }),
+];
+
+export const getStudentCoursesValidator = [
+  param('studentId')
+    .not().isEmpty().withMessage('El ID del estudiante es requerido')
+    .bail()
+    .custom(async (value) => {
+      const user = await User.findById(value);
+      if (!user) {
+        throw new Error('Estudiante no encontrado');
+      }
+      if (user.role !== 'STUDENT_ROLE') {
+        throw new Error('Solo los estudiantes pueden ver los cursos');
+      }
+      return true;
+    }),
+];
+
+export const updateStudentProfileValidator = [
+  param('uid')
+    .not().isEmpty().withMessage('El ID del estudiante es requerido')
+    .bail()
+    .custom(async (value) => {
+      const user = await User.findById(value);
+      if (!user) {
+        throw new Error('Estudiante no encontrado');
+      }
+      if (user.role !== 'STUDENT_ROLE') {
+        throw new Error('Solo los estudiantes pueden actualizar su perfil');
+      }
+      return true;
+    }),
+  body('name').optional().isString().withMessage('El nombre debe ser una cadena de texto'),
+  body('surname').optional().isString().withMessage('El apellido debe ser una cadena de texto'),
+  // Añadir más validaciones según los campos que se pueden actualizar
+];
+
+export const deleteStudentProfileValidator = [
+  param('uid')
+    .not().isEmpty().withMessage('El ID del estudiante es requerido')
+    .bail()
+    .custom(async (value) => {
+      const user = await User.findById(value);
+      if (!user) {
+        throw new Error('Estudiante no encontrado');
+      }
+      if (user.role !== 'STUDENT_ROLE') {
+        throw new Error('Solo los estudiantes pueden eliminar su perfil');
+      }
+      return true;
+    }),
+];
+
+export const registerCourseValidator = [
+  body('name')
+    .not().isEmpty().withMessage('El nombre del curso es requerido'),
+  body('description')
+    .not().isEmpty().withMessage('La descripción del curso es requerida'),
+  body('professorId')
+    .not().isEmpty().withMessage('El ID del profesor es requerido')
+    .bail()
+    .custom(async (value) => {
+      const user = await User.findById(value);
+      if (!user) {
+        throw new Error('Profesor no encontrado');
+      }
+      if (user.role !== 'TEACHER_ROLE') {
+        throw new Error('Solo los profesores pueden crear los cursos');
+      }
+      return true;
+    }),
+];
+
+export const updateCourseValidator = [
+  param('id')
+    .not().isEmpty().withMessage('El ID del curso es requerido')
+    .bail()
+    .custom(async (value) => {
+      const course = await Course.findById(value);
+      if (!course) {
+        throw new Error('Curso no encontrado');
+      }
+      return true;
+    }),
+  body('name').optional().isString().withMessage('El nombre debe ser una cadena de texto'),
+  body('description').optional().isString().withMessage('La descripción debe ser una cadena de texto'),
+  // Añadir más validaciones según los campos que se pueden actualizar
+];
+
+export const deleteCourseValidator = [
+  param('id')
+    .not().isEmpty().withMessage('El ID del curso es requerido')
+    .bail()
+    .custom(async (value) => {
+      const course = await Course.findById(value);
+      if (!course) {
+        throw new Error('Curso no encontrado');
+      }
+      return true;
+    }),
+];
+
+export const getCourseByIdValidator = [
+  param('id')
+    .not().isEmpty().withMessage('El ID del curso es requerido')
+    .bail()
+    .custom(async (value) => {
+      const course = await Course.findById(value);
+      if (!course) {
+        throw new Error('Curso no encontrado');
+      }
+      return true;
+    }),
+];
